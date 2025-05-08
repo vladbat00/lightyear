@@ -1,6 +1,11 @@
 use core::array::TryFromSliceError;
 use no_std_io2::io as io;
 use core::net::SocketAddr;
+#[cfg(target_family = "wasm")]
+use web_time::SystemTimeError;
+#[cfg(not(target_family = "wasm"))]
+use std::time::SystemTimeError;
+
 
 use thiserror::Error;
 
@@ -47,7 +52,7 @@ pub enum Error {
     Ignored(SocketAddr),
     #[cfg(feature = "std")]
     #[error("clock went backwards (did you invent a time machine?): {0}")]
-    SystemTime(#[from] std::time::SystemTimeError),
+    SystemTime(#[from] SystemTimeError),
     #[error("invalid connect token: {0}")]
     InvalidToken(super::token::InvalidTokenError),
     #[error(transparent)]
